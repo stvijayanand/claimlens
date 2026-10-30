@@ -1,0 +1,10 @@
+{
+  "synthetic": true,
+  "errors": [
+    {
+      "error_type": "repair_vs_replace",
+      "line_no": 1,
+      "detail": "swapped op 'repair' -> 'replace'"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "synthetic": false,
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_part_text": "frt door shell",
+      "canonical_part": "front door",
+      "side": "FL",
+      "operation": "replace",
+      "labor_hours": 3.0,
+      "price": 910.0
+    },
+    {
+      "line_no": 2,
+      "raw_part_text": "fender",
+      "canonical_part": "fender",
+      "side": "FL",
+      "operation": "replace",
+      "labor_hours": 3.0,
+      "price": 455.0
+    }
+  ],
+  "unparsed_count": 0
+}

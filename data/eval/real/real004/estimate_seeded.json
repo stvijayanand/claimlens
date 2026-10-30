@@ -1,0 +1,24 @@
+{
+  "synthetic": false,
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_part_text": "rr door shell",
+      "canonical_part": "rear door",
+      "side": "RR",
+      "operation": "repair",
+      "labor_hours": 7.5,
+      "price": 480.0
+    },
+    {
+      "line_no": 2,
+      "raw_part_text": "qtr panel",
+      "canonical_part": "quarter panel",
+      "side": "RR",
+      "operation": "repair",
+      "labor_hours": 4.0,
+      "price": 620.0
+    }
+  ],
+  "unparsed_count": 0
+}

@@ -1,0 +1,15 @@
+{
+  "synthetic": true,
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_part_text": "hood",
+      "canonical_part": "hood",
+      "side": null,
+      "operation": "repair",
+      "labor_hours": 3.5,
+      "price": null
+    }
+  ],
+  "unparsed_count": 0
+}

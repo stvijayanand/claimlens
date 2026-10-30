@@ -1,0 +1,24 @@
+{
+  "synthetic": false,
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_part_text": "frt door shell",
+      "canonical_part": "front door",
+      "side": "FL",
+      "operation": "replace",
+      "labor_hours": 3.0,
+      "price": 850.0
+    },
+    {
+      "line_no": 2,
+      "raw_part_text": "rr door shell",
+      "canonical_part": "rear door",
+      "side": "RL",
+      "operation": "replace",
+      "labor_hours": 3.0,
+      "price": 820.0
+    }
+  ],
+  "unparsed_count": 0
+}

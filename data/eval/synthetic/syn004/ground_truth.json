@@ -1,0 +1,15 @@
+{
+  "synthetic": true,
+  "part": "hood",
+  "side": null,
+  "damage_type": "dent",
+  "box": {
+    "x0": 670,
+    "y0": 510,
+    "x1": 1340,
+    "y1": 770
+  },
+  "box_source": "author",
+  "clean_photo": "clean_rebel.jpg",
+  "prompt": "Photorealistic edit: add a moderate dent on the hood, keeping everything else in the photo unchanged. Match lighting, angle, and paint color; damaged area only, no other modifications."
+}

@@ -1,0 +1,10 @@
+{
+  "synthetic": true,
+  "errors": [
+    {
+      "error_type": "labor_out_of_range",
+      "line_no": 1,
+      "detail": "inflated hours 3.5 -> 8.75 (x2.5)"
+    }
+  ]
+}

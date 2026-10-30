@@ -1,0 +1,15 @@
+{
+  "synthetic": true,
+  "part": "fender",
+  "side": "FL",
+  "damage_type": "scratch",
+  "box": {
+    "x0": 630,
+    "y0": 700,
+    "x1": 1110,
+    "y1": 960
+  },
+  "box_source": "author",
+  "clean_photo": "clean_300s.jpg",
+  "prompt": "Photorealistic edit: add a moderate scratch on the fender (FL side), keeping everything else in the photo unchanged. Match lighting, angle, and paint color; damaged area only, no other modifications."
+}

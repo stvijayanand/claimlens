@@ -1,0 +1,15 @@
+{
+  "synthetic": true,
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_part_text": "front bumper cover",
+      "canonical_part": "front bumper cover",
+      "side": null,
+      "operation": "replace",
+      "labor_hours": 1.5,
+      "price": null
+    }
+  ],
+  "unparsed_count": 0
+}

@@ -1,0 +1,26 @@
+{
+  "dataset": "DrBimmer/car-parts-and-damage-dataset",
+  "license": "MIT",
+  "source_url": "https://huggingface.co/datasets/DrBimmer/car-parts-and-damage-dataset",
+  "original_file": "Car damages dataset/File1/img/Car damages 101.png",
+  "annotated_parts": [
+    "Back-bumper",
+    "Back-door",
+    "Back-wheel",
+    "Back-window",
+    "Fender",
+    "Front-bumper",
+    "Front-door",
+    "Front-wheel",
+    "Front-window",
+    "Grille",
+    "Headlight",
+    "Hood",
+    "Mirror",
+    "Quarter-panel",
+    "Rocker-panel",
+    "Roof",
+    "Windshield"
+  ],
+  "note": "estimate_correct.json authored by visual inspection of the photo + part polygons; seeded via seed_errors transforms."
+}

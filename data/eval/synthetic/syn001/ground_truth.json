@@ -1,0 +1,15 @@
+{
+  "synthetic": true,
+  "part": "trunk lid",
+  "side": null,
+  "damage_type": "dent",
+  "box": {
+    "x0": 540,
+    "y0": 590,
+    "x1": 1150,
+    "y1": 770
+  },
+  "box_source": "author",
+  "clean_photo": "clean_impala.jpg",
+  "prompt": "Photorealistic edit of the car in the photo: add a moderate dent on the car's trunk lid, keeping everything else in the photo unchanged. Match lighting, angle, and paint color; damaged area only, no other modifications."
+}

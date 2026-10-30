@@ -76,3 +76,13 @@ radiator support,unsided,radiator support,1
 radiator support,unsided,core support,1
 frame rail,sided,frame rail,1
 frame rail,sided,chassis rail,1
+bumper absorber,unsided,bumper absorber,1
+bumper absorber,unsided,bumper foam,1
+bumper absorber,unsided,impact absorber,1
+bumper absorber,unsided,energy absorber,1
+condenser,unsided,a/c condenser,1
+condenser,unsided,ac condenser,1
+washer reservoir,unsided,washer reservoir,1
+washer reservoir,unsided,washer bottle,1
+impact sensor,unsided,impact sensor,1
+impact sensor,unsided,crash sensor,1

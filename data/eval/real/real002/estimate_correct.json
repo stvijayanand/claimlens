@@ -1,0 +1,33 @@
+{
+  "synthetic": false,
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_part_text": "hood panel",
+      "canonical_part": "hood",
+      "side": null,
+      "operation": "replace",
+      "labor_hours": 1.2,
+      "price": 690.0
+    },
+    {
+      "line_no": 2,
+      "raw_part_text": "frt bpr cvr",
+      "canonical_part": "front bumper cover",
+      "side": null,
+      "operation": "replace",
+      "labor_hours": 1.5,
+      "price": 540.0
+    },
+    {
+      "line_no": 3,
+      "raw_part_text": "headlamp",
+      "canonical_part": "headlight",
+      "side": "FL",
+      "operation": "replace",
+      "labor_hours": 1.0,
+      "price": 320.0
+    }
+  ],
+  "unparsed_count": 0
+}

@@ -1,0 +1,10 @@
+{
+  "synthetic": false,
+  "errors": [
+    {
+      "error_type": "duplicate",
+      "line_no": 4,
+      "detail": "duplicated line_no=1 as line_no=4"
+    }
+  ]
+}

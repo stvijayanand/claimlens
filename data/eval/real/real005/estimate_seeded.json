@@ -1,0 +1,33 @@
+{
+  "synthetic": false,
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_part_text": "frt bpr cvr",
+      "canonical_part": "front bumper cover",
+      "side": null,
+      "operation": "replace",
+      "labor_hours": 1.5,
+      "price": 610.0
+    },
+    {
+      "line_no": 2,
+      "raw_part_text": "grille",
+      "canonical_part": "front grille",
+      "side": null,
+      "operation": "replace",
+      "labor_hours": null,
+      "price": 180.0
+    },
+    {
+      "line_no": 3,
+      "raw_part_text": "mirror",
+      "canonical_part": "mirror",
+      "side": "FR",
+      "operation": "replace",
+      "labor_hours": 0.5,
+      "price": null
+    }
+  ],
+  "unparsed_count": 0
+}

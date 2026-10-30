@@ -1,0 +1,15 @@
+{
+  "synthetic": true,
+  "part": "rear door",
+  "side": "RL",
+  "damage_type": "dent",
+  "box": {
+    "x0": 920,
+    "y0": 580,
+    "x1": 1380,
+    "y1": 960
+  },
+  "box_source": "author",
+  "clean_photo": "clean_saab.jpg",
+  "prompt": "Photorealistic edit: add a moderate dent on the rear door (RR side), keeping everything else in the photo unchanged. Match lighting, angle, and paint color; damaged area only, no other modifications."
+}

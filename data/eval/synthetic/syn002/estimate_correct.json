@@ -1,0 +1,15 @@
+{
+  "synthetic": true,
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_part_text": "fender",
+      "canonical_part": "fender",
+      "side": "FL",
+      "operation": "repair",
+      "labor_hours": 4.0,
+      "price": null
+    }
+  ],
+  "unparsed_count": 0
+}

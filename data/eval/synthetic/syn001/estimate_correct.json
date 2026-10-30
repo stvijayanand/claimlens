@@ -1,0 +1,15 @@
+{
+  "synthetic": true,
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_part_text": "trunk lid",
+      "canonical_part": "trunk lid",
+      "side": null,
+      "operation": "repair",
+      "labor_hours": 2.0,
+      "price": null
+    }
+  ],
+  "unparsed_count": 0
+}

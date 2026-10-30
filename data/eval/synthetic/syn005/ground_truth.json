@@ -1,0 +1,15 @@
+{
+  "synthetic": true,
+  "part": "front bumper cover",
+  "side": null,
+  "damage_type": "crack",
+  "box": {
+    "x0": 540,
+    "y0": 770,
+    "x1": 1000,
+    "y1": 960
+  },
+  "box_source": "author",
+  "clean_photo": "clean_echo.jpg",
+  "prompt": "Photorealistic edit: add a moderate crack on the front bumper cover, keeping everything else in the photo unchanged. Match lighting, angle, and paint color; damaged area only, no other modifications."
+}

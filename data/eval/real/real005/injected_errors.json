@@ -1,0 +1,10 @@
+{
+  "synthetic": false,
+  "errors": [
+    {
+      "error_type": "phantom_line",
+      "line_no": 3,
+      "detail": "added phantom line for undamaged part 'mirror'"
+    }
+  ]
+}

@@ -327,3 +327,55 @@ def segment(
         }
     )
     return [SegmentMask(**m) for m in raw["masks"]]
+
+
+def edit_image(
+    image: bytes,
+    prompt: str,
+    *,
+    model: str | None = None,
+    transport: Transport | None = None,
+) -> bytes:
+    """Edit one image with Muse Image; return the edited image bytes.
+
+    Custom transports normalize to ``{"image_b64": ...}``. The default
+    transport maps to the OpenAI-compatible ``images.edit`` call and is
+    PROVISIONAL until confirmed against the live API (Issue #6 staging).
+    """
+    payload = {
+        "kind": "edit_image",
+        "model": model or config.IMAGE_MODEL,
+        "image_b64": base64.b64encode(image).decode("ascii"),
+        "prompt": prompt,
+    }
+    if transport is not None:
+        return base64.b64decode(transport(payload)["image_b64"])
+    client = get_client()
+    if image[:2] == b"\xff\xd8":
+        file_tuple = ("clean.jpg", image, "image/jpeg")
+    else:
+        file_tuple = ("clean.png", image, "image/png")
+    try:
+        response = client.images.edit(
+            model=payload["model"],
+            prompt=prompt,
+            image=file_tuple,
+        )
+    except Exception as exc:
+        raise MetaClientError(f"image edit call failed: {exc}") from exc
+    b64 = getattr(response.data[0], "b64_json", None)
+    if b64 is None:
+        url = getattr(response.data[0], "url", None)
+        if url is None:
+            raise MetaClientError("image edit returned neither b64 nor url")
+        import httpx
+
+        try:
+            fetched = httpx.get(url, timeout=120)
+            fetched.raise_for_status()
+        except Exception as exc:
+            raise MetaClientError(
+                f"image edit result fetch failed: {exc}"
+            ) from exc
+        return fetched.content
+    return base64.b64decode(b64)

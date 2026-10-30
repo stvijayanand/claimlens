@@ -1,0 +1,10 @@
+{
+  "synthetic": false,
+  "errors": [
+    {
+      "error_type": "missing_line",
+      "line_no": 2,
+      "detail": "dropped line covering 'rr door shell' (op=replace)"
+    }
+  ]
+}

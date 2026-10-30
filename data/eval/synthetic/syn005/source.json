@@ -1,0 +1,10 @@
+{
+  "synthetic": true,
+  "clean_photo_file": "clean_echo.jpg",
+  "clean_photo_source": "https://commons.wikimedia.org/wiki/File:Facelift_and_Prefacelift_Toyota_Echo_parked_side_by_side.jpg",
+  "clean_photo_license": "CC BY-SA 4.0",
+  "edit_model": "muse-image-1.0",
+  "requested_damage": "crack",
+  "requested_at": "350,650",
+  "note": "images.edit returned a fresh composition, not a true edit of the input; ground_truth box authored by inspecting photo.jpg (box_source=author). photo.jpg holds raw API bytes (WebP)."
+}

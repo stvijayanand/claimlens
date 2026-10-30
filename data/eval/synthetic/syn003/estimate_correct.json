@@ -1,0 +1,15 @@
+{
+  "synthetic": true,
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_part_text": "rear door",
+      "canonical_part": "rear door",
+      "side": "RL",
+      "operation": "repair",
+      "labor_hours": 4.0,
+      "price": null
+    }
+  ],
+  "unparsed_count": 0
+}
