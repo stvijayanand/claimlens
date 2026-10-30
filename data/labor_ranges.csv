@@ -1,0 +1,29 @@
+canonical_part,operation,low_hrs,high_hrs
+front bumper cover,replace,1.0,2.0
+front bumper cover,refinish,2.0,3.0
+front bumper cover,ri,0.5,1.0
+rear bumper cover,replace,1.0,2.0
+rear bumper cover,refinish,2.0,3.0
+rear bumper cover,ri,0.5,1.0
+hood,replace,0.8,1.5
+hood,repair,2.0,5.0
+hood,refinish,2.5,3.5
+fender,replace,1.5,3.0
+fender,repair,2.0,6.0
+fender,refinish,2.0,3.0
+front door,replace,2.0,4.0
+front door,repair,2.0,6.0
+front door,refinish,2.5,3.5
+front door,ri,0.5,1.0
+rear door,replace,2.0,4.0
+rear door,repair,2.0,6.0
+rear door,refinish,2.5,3.5
+headlight,replace,0.5,1.5
+headlight,ri,0.3,0.8
+taillight,replace,0.3,1.0
+mirror,replace,0.3,0.8
+windshield,replace,1.5,2.5
+quarter panel,replace,4.0,8.0
+quarter panel,repair,3.0,8.0
+bumper reinforcement,replace,0.5,1.5
+wheel,replace,0.3,0.6

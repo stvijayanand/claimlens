@@ -1,0 +1,78 @@
+canonical_part,side_scope,alias,hidden
+front bumper cover,unsided,front bumper cover,0
+front bumper cover,unsided,frt bumper cover,0
+front bumper cover,unsided,frt bpr cvr,0
+front bumper cover,unsided,front bumper,0
+front bumper cover,unsided,frt bumper,0
+rear bumper cover,unsided,rear bumper cover,0
+rear bumper cover,unsided,rr bumper cover,0
+rear bumper cover,unsided,rr bpr cvr,0
+rear bumper cover,unsided,rear bumper,0
+rear bumper cover,unsided,rr bumper,0
+hood,unsided,hood,0
+hood,unsided,bonnet,0
+hood,unsided,hood panel,0
+trunk lid,unsided,trunk lid,0
+trunk lid,unsided,deck lid,0
+trunk lid,unsided,trunk,0
+tailgate,unsided,tailgate,0
+tailgate,unsided,liftgate,0
+tailgate,unsided,rear hatch,0
+roof,unsided,roof,0
+roof,unsided,roof panel,0
+windshield,unsided,windshield,0
+windshield,unsided,windshield glass,0
+windshield,unsided,front windshield,0
+rear glass,unsided,rear glass,0
+rear glass,unsided,back glass,0
+rear glass,unsided,rear windshield,0
+front grille,unsided,front grille,0
+front grille,unsided,grille,0
+front grille,unsided,grill,0
+spoiler,unsided,spoiler,0
+spoiler,unsided,rear spoiler,0
+headlight,sided,headlight,0
+headlight,sided,headlamp,0
+headlight,sided,head lamp,0
+headlight,sided,head light,0
+taillight,sided,taillight,0
+taillight,sided,tail lamp,0
+taillight,sided,tail light,0
+taillight,sided,rear lamp,0
+fog light,sided,fog light,0
+fog light,sided,fog lamp,0
+fender,sided,fender,0
+fender,sided,wing,0
+front door,sided,front door,0
+front door,sided,frt door,0
+rear door,sided,rear door,0
+rear door,sided,rr door,0
+rear door,sided,back door,0
+door handle,sided,door handle,0
+door handle,sided,outside door handle,0
+mirror,sided,mirror,0
+mirror,sided,side mirror,0
+mirror,sided,door mirror,0
+quarter panel,sided,quarter panel,0
+quarter panel,sided,qtr panel,0
+rocker panel,sided,rocker panel,0
+rocker panel,sided,rocker,0
+rocker panel,sided,side skirt,0
+side glass,sided,side glass,0
+side glass,sided,door glass,0
+wheel,sided,wheel,0
+wheel,sided,rim,0
+wheel,sided,alloy wheel,0
+tire,sided,tire,0
+tire,sided,tyre,0
+fender liner,sided,fender liner,0
+fender liner,sided,inner fender,0
+fender liner,sided,splash shield,0
+bumper reinforcement,unsided,bumper reinforcement,1
+bumper reinforcement,unsided,bumper bar,1
+bumper reinforcement,unsided,crash bar,1
+bumper reinforcement,unsided,reinforcement bar,1
+radiator support,unsided,radiator support,1
+radiator support,unsided,core support,1
+frame rail,sided,frame rail,1
+frame rail,sided,chassis rail,1
