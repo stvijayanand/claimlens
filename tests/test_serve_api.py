@@ -448,6 +448,49 @@ def test_get_crop_bytes_and_unknown_404(client, db_file):
     assert client.get("/crops/crop-missing").status_code == 404
 
 
+def test_post_run_crop_serves_pipeline_bytes(client, db_file, monkeypatch):
+    """Crops written by a real pipeline run serve back their bytes.
+
+    Regression guard: real crop ids (spaces/colons from part labels and
+    boxes) and real ``make_crops`` PNG bytes must serve exactly like the
+    synthetic row above.
+    """
+
+    def pipeline(car_id, run_id):
+        return api.run_pipeline(
+            car_id,
+            run_id,
+            listing_transport=_listing_stub,
+            segment_transport=_segment_stub,
+            assess_transport=_assess_stub,
+            extract_transport=_extract_stub,
+        )
+
+    monkeypatch.setattr(api, "PIPELINE", pipeline)
+    car_id = _make_car(client)
+    run_id = client.post(f"/cars/{car_id}/run").json()["run_id"]
+    status = None
+    for _ in range(240):
+        status = client.get(f"/cars/{car_id}/runs/{run_id}").json()
+        if status["status"] in ("done", "error"):
+            break
+        time.sleep(0.25)
+    assert status["status"] == "done"
+    conn = db.connect(db_file)
+    try:
+        rows = conn.execute("SELECT crop_id, img FROM crops").fetchall()
+    finally:
+        conn.close()
+    assert rows, "pipeline produced no crops to serve"
+    from urllib.parse import quote
+
+    for crop_id, blob in rows:
+        resp = client.get("/crops/" + quote(crop_id, safe=""))
+        assert resp.status_code == 200
+        assert resp.content == bytes(blob)
+        assert resp.headers["content-type"] == "image/png"
+
+
 # --- run_pipeline with stub transports (real stages, no network) -------------
 
 
