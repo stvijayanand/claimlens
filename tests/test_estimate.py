@@ -149,3 +149,33 @@ def test_unparseable_whole_doc_propagates_schema_violation():
     with pytest.raises(meta_client.SchemaViolation):
         estimate.extract_estimate(conn, "car1", transport=bad)
     conn.close()
+
+
+def test_zero_valid_lines_writes_no_rows_without_crash():
+    conn = _memdb()
+    _seed(conn)
+    # Stale row from an earlier extraction must still be cleared.
+    conn.execute(
+        "INSERT INTO estimate_lines (car_id, line_no, line)"
+        " VALUES (?, ?, ?)",
+        ["car1", 9, '{"line_no": 9}'],
+    )
+
+    def stub(payload):
+        return {
+            "data": {
+                "lines": [
+                    _line(1, "mystery line with no operation", None),
+                    {"unexpected": "shape entirely"},
+                ]
+            }
+        }
+
+    doc = estimate.extract_estimate(conn, "car1", transport=stub)
+    assert doc.lines == []
+    assert doc.unparsed_count == 2
+    rows = conn.execute(
+        "SELECT COUNT(*) FROM estimate_lines WHERE car_id = ?", ["car1"]
+    ).fetchone()
+    assert rows[0] == 0
+    conn.close()

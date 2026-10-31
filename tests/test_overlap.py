@@ -168,6 +168,23 @@ def test_list_visible_parts_attaches_taxonomy_and_filters():
     conn.close()
 
 
+def test_list_visible_parts_all_filtered_writes_no_rows():
+    conn = _memdb_with_photos(["p1"])
+    stub = _listing_stub(
+        [
+            {"canonical_part": "hood", "side": None, "confidence": 0.1},
+            {"canonical_part": "roof", "side": None, "confidence": 0.05},
+        ]
+    )
+    visible = vision.list_visible_parts(conn, "p1", transport=stub)
+    assert visible.parts == []
+    rows = conn.execute(
+        "SELECT COUNT(*) FROM visible_parts WHERE photo_id = 'p1'"
+    ).fetchone()
+    assert rows[0] == 0
+    conn.close()
+
+
 # --- SAM call budget ---
 
 

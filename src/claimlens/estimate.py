@@ -159,8 +159,15 @@ def extract_estimate(
         valid.append(line.model_copy(update={"canonical_part": None}))
 
     conn.execute("DELETE FROM estimate_lines WHERE car_id = ?", [car_id])
-    conn.executemany(
-        "INSERT INTO estimate_lines (car_id, line_no, line) VALUES (?, ?, ?)",
-        [(car_id, line.line_no, line.model_dump_json()) for line in valid],
-    )
+    # DuckDB rejects executemany with an empty parameter list, so an
+    # estimate with zero valid lines skips the insert (rows already cleared).
+    if valid:
+        conn.executemany(
+            "INSERT INTO estimate_lines (car_id, line_no, line)"
+            " VALUES (?, ?, ?)",
+            [
+                (car_id, line.line_no, line.model_dump_json())
+                for line in valid
+            ],
+        )
     return EstimateDoc(lines=valid, unparsed_count=unparsed_count)

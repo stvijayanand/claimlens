@@ -6,7 +6,7 @@ Per-photo order (spec section 6): ``list_visible_parts`` -> ``segment_photo``
 Mask encoding (v1): ``SegmentMask.mask`` is a row-major, 1-byte-per-pixel
 foreground bitmap cropped to the mask box, so ``len(mask) ==
 (x1 - x0) * (y1 - y0)`` and any nonzero byte is foreground. Stub transports in
-tests produce this layout; the future live SAM transport must normalize to it.
+tests produce this layout; the live SAM transport normalizes to it.
 
 v1 simplifications: one part phrase per distinct canonical part (no
 side-qualified phrases); part-batch labels are treated as canonical parts.
@@ -90,11 +90,14 @@ def list_visible_parts(
         p for p in result.parts if p.confidence >= config.MIN_PART_CONFIDENCE
     ]
     conn.execute("DELETE FROM visible_parts WHERE photo_id = ?", [photo_id])
-    conn.executemany(
-        "INSERT INTO visible_parts (photo_id, canonical_part, side, confidence)"
-        " VALUES (?, ?, ?, ?)",
-        [(photo_id, p.canonical_part, p.side, p.confidence) for p in kept],
-    )
+    # DuckDB rejects executemany with an empty parameter list, so a photo
+    # with every part filtered out skips the insert (rows already cleared).
+    if kept:
+        conn.executemany(
+            "INSERT INTO visible_parts (photo_id, canonical_part, side, confidence)"
+            " VALUES (?, ?, ?, ?)",
+            [(photo_id, p.canonical_part, p.side, p.confidence) for p in kept],
+        )
     return VisibleParts(photo_id=photo_id, parts=kept)
 
 
@@ -104,13 +107,15 @@ def segment_photo(
     parts: VisibleParts | list[VisiblePart] | list[str],
     *,
     transport: Transport | None = None,
+    on_usage: UsageHook | None = None,
 ) -> tuple[list[SegmentMask], list[SegmentMask]]:
     """Segment one photo; write ``masks`` rows.
 
     Makes exactly two ``segment()`` calls: one batch over the distinct part
     phrases plus one batch over ``DAMAGE_PHRASES``. With no part phrases the
     part batch is skipped (a single damage batch), keeping the per-car budget
-    at or under photos x 2 batches.
+    at or under photos x 2 batches. Live, each batch fans out to one SAM
+    request per concept phrase; stub transports emit no usage events.
     """
     items = parts.parts if isinstance(parts, VisibleParts) else list(parts)
     phrases: list[str] = []
@@ -121,9 +126,11 @@ def segment_photo(
     img = _photo_bytes(conn, photo_id)
     part_masks: list[SegmentMask] = []
     if phrases:
-        part_masks = meta_client.segment(img, phrases, transport=transport)
+        part_masks = meta_client.segment(
+            img, phrases, transport=transport, on_usage=on_usage
+        )
     damage_masks = meta_client.segment(
-        img, list(config.DAMAGE_PHRASES), transport=transport
+        img, list(config.DAMAGE_PHRASES), transport=transport, on_usage=on_usage
     )
     conn.execute("DELETE FROM masks WHERE photo_id = ?", [photo_id])
     seq = 0
@@ -281,7 +288,7 @@ def process_photo(
         conn, photo_id, transport=list_transport, on_usage=on_usage
     )
     part_masks, damage_masks = segment_photo(
-        conn, photo_id, visible, transport=segment_transport
+        conn, photo_id, visible, transport=segment_transport, on_usage=on_usage
     )
     damaged = compute_overlaps(conn, photo_id)
     crop_ids = make_crops(conn, photo_id, damaged)

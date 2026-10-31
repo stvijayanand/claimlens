@@ -9,10 +9,10 @@ rather than returning a guessed value.
 Transports are injectable (``transport=`` stub) so validation, retry, and
 cache behavior are unit-testable without an API key. The default transport
 targets chat-completions-with-JSON-schema as the most widely supported
-OpenAI-compatible mapping; the file-attachment mapping and model/endpoint IDs
-are PROVISIONAL until confirmed against the live API at the Issue #1 gate.
-``segment()`` additionally needs its live response shape confirmed, so its
-default transport raises ``NotImplementedError`` with that pointer.
+OpenAI-compatible mapping; the file-attachment mapping is PROVISIONAL until
+confirmed against the live API. ``segment()`` calls SAM 3.1 over the live
+Responses API (verified 2026-10-31); responses are parsed with the
+``meta-sam-parser`` package and normalized to the v1 mask layout.
 """
 
 from __future__ import annotations
@@ -300,33 +300,163 @@ def structured(
     return obj
 
 
+def _sniff_image_mime(image: bytes) -> str:
+    """Return ``image/png`` for PNG magic bytes, else ``image/jpeg``."""
+    if image.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "image/png"
+    return "image/jpeg"
+
+
+def _raster_to_box_mask(
+    raster: bytes, raster_w: int, raster_h: int, box_w: int, box_h: int
+) -> bytes:
+    """Resize a decoded SAM raster to its box (nearest neighbor).
+
+    Live rasters arrive at (or within a pixel of) the box size; the resize is
+    a guard so the v1 invariant ``len(mask) == box_w * box_h`` always holds.
+    """
+    if raster_w == box_w and raster_h == box_h:
+        return bytes(raster)
+    from PIL import Image
+
+    img = Image.frombytes("L", (raster_w, raster_h), bytes(raster))
+    return img.resize((box_w, box_h), Image.NEAREST).tobytes()
+
+
+def _masks_from_output_text(text: str, label: str) -> list[SegmentMask]:
+    """Parse one SAM ``output_text`` lane into v1 ``SegmentMask`` rows.
+
+    Every record pairs exactly one box with exactly one mask; both carry the
+    request phrase as ``label``. Empty text (zero matches) yields no rows.
+    """
+    from meta_sam_parser import (
+        CompletedOutcome,
+        SegmentationBoxRecord,
+        SegmentationMaskRecord,
+        decode_mask_to_raster,
+        image_segmentation_format,
+    )
+
+    if not text.strip():
+        return []
+    parser = image_segmentation_format().create_parser()
+    try:
+        parser.push(text)
+        result = parser.finish(CompletedOutcome()).result
+    except Exception as exc:
+        raise MetaClientError(f"SAM response parse failed: {exc}") from exc
+    boxes: dict[str, list[SegmentationBoxRecord]] = {}
+    masks: dict[str, list[SegmentationMaskRecord]] = {}
+    for record in result.records:
+        if isinstance(record, SegmentationBoxRecord):
+            boxes.setdefault(record.object_id, []).append(record)
+        elif isinstance(record, SegmentationMaskRecord):
+            masks.setdefault(record.object_id, []).append(record)
+    out: list[SegmentMask] = []
+    for object_id in boxes:
+        for box, mask_record in zip(boxes[object_id], masks.get(object_id, [])):
+            x0, y0 = int(round(box.left)), int(round(box.top))
+            x1, y1 = int(round(box.right)), int(round(box.bottom))
+            mask = mask_record.mask
+            try:
+                raster = decode_mask_to_raster(mask)
+            except Exception as exc:
+                raise MetaClientError(
+                    f"SAM mask decode failed: {exc}"
+                ) from exc
+            out.append(
+                SegmentMask(
+                    label=label,
+                    x0=x0,
+                    y0=y0,
+                    x1=x1,
+                    y1=y1,
+                    mask=_raster_to_box_mask(
+                        raster, mask.width, mask.height, x1 - x0, y1 - y0
+                    ),
+                )
+            )
+    return out
+
+
+def _segment_live(
+    image: bytes,
+    phrases: list[str],
+    model: str,
+    on_usage: UsageHook | None,
+) -> list[SegmentMask]:
+    """Run SAM 3.1 over the Responses API: one request per concept phrase."""
+    client = get_client()
+    data_url = (
+        f"data:{_sniff_image_mime(image)};base64,"
+        + base64.b64encode(image).decode("ascii")
+    )
+    out: list[SegmentMask] = []
+    for phrase in phrases:
+        try:
+            response = client.responses.create(
+                model=model,
+                input=[
+                    {
+                        "type": "message",
+                        "role": "user",
+                        "content": [
+                            {"type": "input_text", "text": phrase},
+                            {
+                                "type": "input_image",
+                                "image_url": data_url,
+                            },
+                        ],
+                    }
+                ],
+                metadata={"mask_encoding": "one_bit"},
+            )
+        except Exception as exc:  # surface as our error type, keep cause
+            raise MetaClientError(f"SAM call failed: {exc}") from exc
+        usage = getattr(response, "usage", None)
+        if on_usage is not None:
+            on_usage(
+                {
+                    "kind": "segment",
+                    "model": model,
+                    "cached": False,
+                    "usage": usage.model_dump() if usage is not None else None,
+                }
+            )
+        out.extend(_masks_from_output_text(response.output_text or "", phrase))
+    return out
+
+
 def segment(
     image: bytes,
     phrases: list[str],
     *,
     model: str | None = None,
     transport: Transport | None = None,
+    on_usage: UsageHook | None = None,
 ) -> list[SegmentMask]:
     """Run SAM segmentation for ``phrases`` on one image.
 
-    Custom transports normalize to ``{"masks": [{label, x0..y1, mask}]}``. The
-    default transport is intentionally unimplemented: the live SAM endpoint and
-    response shape must be confirmed first (Issue #1 gate).
+    Custom transports normalize to ``{"masks": [{label, x0..y1, mask}]}`` and
+    emit no usage events (replay/test path). The default transport calls SAM
+    3.1 live — one request per concept phrase, each billed as one segmented
+    image — parses the special-token ``output_text`` with ``meta-sam-parser``,
+    and normalizes every mask to the v1 box-cropped bitmap layout. Live calls
+    emit one ``on_usage`` event per request (``kind="segment"``).
     """
-    if transport is None:
-        raise NotImplementedError(
-            "Default SAM transport needs the live Meta Model API endpoint and "
-            "response shape confirmed (Issue #1 gate). Pass transport= in tests."
+    if transport is not None:
+        raw = transport(
+            {
+                "kind": "segment",
+                "model": model or config.SAM_MODEL,
+                "image_b64": base64.b64encode(image).decode("ascii"),
+                "phrases": list(phrases),
+            }
         )
-    raw = transport(
-        {
-            "kind": "segment",
-            "model": model or config.SAM_MODEL,
-            "image_b64": base64.b64encode(image).decode("ascii"),
-            "phrases": list(phrases),
-        }
+        return [SegmentMask(**m) for m in raw["masks"]]
+    return _segment_live(
+        image, list(phrases), model or config.SAM_MODEL, on_usage
     )
-    return [SegmentMask(**m) for m in raw["masks"]]
 
 
 def edit_image(

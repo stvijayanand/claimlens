@@ -5,7 +5,7 @@ feature flags, and the price table. Each value can be overridden with an
 environment variable of the same name.
 
 Values marked PROVISIONAL come from the submission doc and must be confirmed
-against the live Meta Model API at the Issue #1 gate.
+against the live Meta Model API.
 """
 
 from __future__ import annotations
@@ -53,13 +53,16 @@ META_MODEL_BASE_URL = _env_str("META_MODEL_BASE_URL", "")  # required; no defaul
 SPARK_MODEL = _env_str(
     "CLAIMLENS_SPARK_MODEL", "muse-spark-1.3"
 )  # verified live 2026-10-30 (chat-completions + strict json_schema)
-SAM_MODEL = _env_str("CLAIMLENS_SAM_MODEL", "sam-3.1")  # PROVISIONAL id
+SAM_MODEL = _env_str(
+    "CLAIMLENS_SAM_MODEL", "sam-3.1"
+)  # verified live 2026-10-31 (Responses API + meta-sam-parser)
 IMAGE_MODEL = _env_str("CLAIMLENS_IMAGE_MODEL", "muse-image")  # PROVISIONAL id
 
 EFFORT_LOW = _env_str("CLAIMLENS_EFFORT_LOW", "low")
 EFFORT_HIGH = _env_str("CLAIMLENS_EFFORT_HIGH", "high")
 
-# --- Price table (USD; PROVISIONAL doc figures, confirm live) -------------
+# --- Price table (USD; SAM figure confirmed live 2026-10-31) ------------
+# SAM 3.1 image segmentation: $2.50 per 1,000 images (Meta Model API pricing).
 SAM_USD_PER_IMAGE = _env_float("CLAIMLENS_SAM_USD_PER_IMAGE", 2.50 / 1000)
 SYNTH_IMAGE_USD = _env_float("CLAIMLENS_SYNTH_IMAGE_USD", 0.01)
 # Spark pricing unknown until the live check; per-call fallback used only when
