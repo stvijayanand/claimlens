@@ -60,13 +60,17 @@ def list_visible_parts(
     from both the return value and the database.
     """
     img = _photo_bytes(conn, photo_id)
+    # The long stable taxonomy block leads the message so OpenAI-compatible
+    # prompt-prefix caching can reuse it across listing calls; the
+    # photo-specific instruction trails (a photo_id up front would break
+    # the shared prefix on every call).
     messages = [
         {"role": "system", "content": _LISTING_SYSTEM},
         {
             "role": "user",
             "content": (
-                f"List the car parts visible in photo {photo_id}.\n\n"
-                f"{taxonomy.prompt_block()}"
+                f"{taxonomy.prompt_block()}\n\n"
+                f"List the car parts visible in photo {photo_id}."
             ),
         },
     ]

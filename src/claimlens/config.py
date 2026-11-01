@@ -61,13 +61,26 @@ IMAGE_MODEL = _env_str("CLAIMLENS_IMAGE_MODEL", "muse-image")  # PROVISIONAL id
 EFFORT_LOW = _env_str("CLAIMLENS_EFFORT_LOW", "low")
 EFFORT_HIGH = _env_str("CLAIMLENS_EFFORT_HIGH", "high")
 
-# --- Price table (USD; SAM figure confirmed live 2026-10-31) ------------
-# SAM 3.1 image segmentation: $2.50 per 1,000 images (Meta Model API pricing).
+# --- Price table (USD) ----------------------------------------------------
+# SAM 3.1 image segmentation: $2.50 per 1,000 images (Meta Model API pricing,
+# confirmed live 2026-10-31).
 SAM_USD_PER_IMAGE = _env_float("CLAIMLENS_SAM_USD_PER_IMAGE", 2.50 / 1000)
 SYNTH_IMAGE_USD = _env_float("CLAIMLENS_SYNTH_IMAGE_USD", 0.01)
-# Spark pricing unknown until the live check; per-call fallback used only when
-# the API returns no usage payload (figures then marked estimated).
-SPARK_USD_PER_CALL = _env_float("CLAIMLENS_SPARK_USD_PER_CALL", 0.0)
+# Spark 1.3 token prices, "muse-spark-1.3" tier (not used to improve Meta
+# products; https://dev.meta.ai, confirmed 2026-10-31). The contributor tier
+# (model id "muse-spark-1.3-contributor") is $0.10/$0.002/$0.20 per Mtok if
+# the project opts in — override these three values then.
+SPARK_USD_PER_MTOK_INPUT = _env_float("CLAIMLENS_SPARK_USD_PER_MTOK_INPUT", 1.25)
+SPARK_USD_PER_MTOK_CACHED_INPUT = _env_float(
+    "CLAIMLENS_SPARK_USD_PER_MTOK_CACHED_INPUT", 0.15
+)
+SPARK_USD_PER_MTOK_OUTPUT = _env_float(
+    "CLAIMLENS_SPARK_USD_PER_MTOK_OUTPUT", 4.25
+)
+# Per-call fallback, used only when the API returns no usage payload
+# (figures then marked estimated): a representative call of ~2k input +
+# ~0.5k output tokens at the rates above ≈ $0.005.
+SPARK_USD_PER_CALL = _env_float("CLAIMLENS_SPARK_USD_PER_CALL", 0.005)
 
 # --- Pipeline tunables ----------------------------------------------------
 DAMAGE_PHRASES = ("dent", "scratch", "crack")

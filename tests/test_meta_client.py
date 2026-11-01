@@ -320,3 +320,62 @@ def test_raster_to_box_mask_resizes_to_box():
     assert out == bytes(
         [1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1]
     )
+
+
+# --- usage-event pricing (spec section 13) ---
+
+
+def test_event_cost_usd_prices_token_usage_exactly(monkeypatch):
+    monkeypatch.setattr(config, "SPARK_USD_PER_MTOK_INPUT", 1.25)
+    monkeypatch.setattr(config, "SPARK_USD_PER_MTOK_CACHED_INPUT", 0.15)
+    monkeypatch.setattr(config, "SPARK_USD_PER_MTOK_OUTPUT", 4.25)
+    usd, estimated = meta_client.event_cost_usd(
+        {
+            "kind": "visible_parts",
+            "cached": False,
+            "usage": {"prompt_tokens": 2000, "completion_tokens": 500},
+        }
+    )
+    assert usd == pytest.approx(2000 * 1.25 / 1e6 + 500 * 4.25 / 1e6)
+    assert estimated is False
+
+
+def test_event_cost_usd_honors_cached_prompt_tokens(monkeypatch):
+    monkeypatch.setattr(config, "SPARK_USD_PER_MTOK_INPUT", 1.25)
+    monkeypatch.setattr(config, "SPARK_USD_PER_MTOK_CACHED_INPUT", 0.15)
+    monkeypatch.setattr(config, "SPARK_USD_PER_MTOK_OUTPUT", 4.25)
+    usd, estimated = meta_client.event_cost_usd(
+        {
+            "kind": "visible_parts",
+            "cached": False,
+            "usage": {
+                "prompt_tokens": 2000,
+                "completion_tokens": 100,
+                "prompt_tokens_details": {"cached_tokens": 1500},
+            },
+        }
+    )
+    assert usd == pytest.approx(
+        500 * 1.25 / 1e6 + 1500 * 0.15 / 1e6 + 100 * 4.25 / 1e6
+    )
+    assert estimated is False
+
+
+def test_event_cost_usd_falls_back_without_usable_usage(monkeypatch):
+    monkeypatch.setattr(config, "SPARK_USD_PER_CALL", 0.005)
+    for usage in (None, {}, {"stub": 1}, {"prompt_tokens": 10}):
+        usd, estimated = meta_client.event_cost_usd(
+            {"kind": "damage_assessment", "cached": False, "usage": usage}
+        )
+        assert (usd, estimated) == (0.005, True)
+
+
+def test_event_cost_usd_cached_free_and_segment_at_sam_rate(monkeypatch):
+    monkeypatch.setattr(config, "SPARK_USD_PER_CALL", 0.005)
+    monkeypatch.setattr(config, "SAM_USD_PER_IMAGE", 0.0025)
+    assert meta_client.event_cost_usd(
+        {"kind": "visible_parts", "cached": True, "usage": None}
+    ) == (0.0, False)
+    assert meta_client.event_cost_usd(
+        {"kind": "segment", "cached": False, "usage": None}
+    ) == (0.0025, True)

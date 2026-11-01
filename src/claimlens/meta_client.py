@@ -300,6 +300,58 @@ def structured(
     return obj
 
 
+def _token_counts(usage: Any) -> tuple[int, int, int] | None:
+    """(uncached_input, cached_input, output) tokens, or None if unusable.
+
+    Reads the OpenAI usage shape (``prompt_tokens``/``completion_tokens``,
+    honoring ``prompt_tokens_details.cached_tokens`` at the cached-input
+    rate). Both counts must be present numbers; anything else (no usage,
+    stub payloads) returns None so the caller falls back.
+    """
+    if not isinstance(usage, dict):
+        return None
+    prompt = usage.get("prompt_tokens")
+    completion = usage.get("completion_tokens")
+    if isinstance(prompt, bool) or isinstance(completion, bool):
+        return None
+    if not isinstance(prompt, (int, float)) or not isinstance(
+        completion, (int, float)
+    ):
+        return None
+    details = usage.get("prompt_tokens_details") or {}
+    cached = details.get("cached_tokens", 0) if isinstance(details, dict) else 0
+    if not isinstance(cached, (int, float)) or isinstance(cached, bool):
+        cached = 0
+    cached = max(0, min(int(cached), int(prompt)))
+    return (int(prompt) - cached, cached, int(completion))
+
+
+def event_cost_usd(event: dict[str, Any]) -> tuple[float, bool]:
+    """(usd, estimated): price one usage event at the config price table.
+
+    Cached events cost $0. Fresh ``segment`` events price at
+    ``SAM_USD_PER_IMAGE`` (each SAM request bills one image). Fresh Spark
+    events with a token usage payload price from exact tokens (cached
+    prompt tokens at the cached-input rate); without a usable payload
+    they fall back to ``SPARK_USD_PER_CALL`` and mark the figure
+    estimated (spec section 13).
+    """
+    if event.get("cached"):
+        return 0.0, False
+    if event.get("kind") == "segment":
+        return config.SAM_USD_PER_IMAGE, True
+    counts = _token_counts(event.get("usage"))
+    if counts is None:
+        return config.SPARK_USD_PER_CALL, True
+    uncached_in, cached_in, out = counts
+    return (
+        uncached_in * config.SPARK_USD_PER_MTOK_INPUT / 1_000_000
+        + cached_in * config.SPARK_USD_PER_MTOK_CACHED_INPUT / 1_000_000
+        + out * config.SPARK_USD_PER_MTOK_OUTPUT / 1_000_000,
+        False,
+    )
+
+
 def _sniff_image_mime(image: bytes) -> str:
     """Return ``image/png`` for PNG magic bytes, else ``image/jpeg``."""
     if image.startswith(b"\x89PNG\r\n\x1a\n"):

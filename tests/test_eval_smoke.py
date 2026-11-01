@@ -17,7 +17,8 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from eval.run_eval import run_eval  # noqa: E402
+from claimlens.eval.datasets import load_car  # noqa: E402
+from eval.run_eval import run_car, run_eval  # noqa: E402
 
 
 def _run_cli(*args: str, cwd: Path) -> subprocess.CompletedProcess[str]:
@@ -106,6 +107,32 @@ def test_broken_matching_moves_the_metrics(monkeypatch, tmp_path):
     assert baseline["precision"] == 1.0
     assert broken["recall"] < baseline["recall"]
     assert broken["precision"] < baseline["precision"]
+
+
+def test_extraction_scored_against_seeded_input():
+    """Extraction accuracy measures transcribe fidelity vs the seeded input.
+
+    The pipeline reads ``estimate_seeded.json``; scoring the extractor
+    against ``estimate_correct.json`` punishes faithful transcription of
+    seeded errors (a dropped line is absent from the input, so no
+    extractor could ever reproduce it). syn003's swapped op and syn001's
+    dropped line must therefore not count against extraction.
+    """
+    swapped = run_car(
+        load_car(ROOT / "data" / "eval" / "synthetic" / "syn003",
+                 split="synthetic"),
+        None,  # cold: every replayed call misses, nothing saved back
+    )
+    assert swapped.ok, swapped.error
+    assert (swapped.extraction_matched, swapped.extraction_total) == (1, 1)
+
+    dropped = run_car(
+        load_car(ROOT / "data" / "eval" / "synthetic" / "syn001",
+                 split="synthetic"),
+        None,
+    )
+    assert dropped.ok, dropped.error
+    assert (dropped.extraction_matched, dropped.extraction_total) == (0, 0)
 
 
 @pytest.mark.parametrize("split", ["real", "synthetic"])

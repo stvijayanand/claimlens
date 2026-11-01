@@ -104,7 +104,7 @@ def test_match_missing_line_on_part_not_line_no():
 
 
 def test_score_extraction_exact_and_mismatches():
-    correct = [
+    reference = [
         {"line_no": 1, "canonical_part": "Front Door",
          "operation": "repair", "labor_hours": 3.0},
         {"line_no": 2, "canonical_part": "fender",
@@ -118,19 +118,19 @@ def test_score_extraction_exact_and_mismatches():
         {"line_no": 3, "canonical_part": "mirror",
          "operation": "replace", "labor_hours": 0.5},
     ]
-    assert score_extraction(db_lines, correct) == (2, 2)
+    assert score_extraction(db_lines, reference) == (2, 2)
 
     swapped = [dict(db_lines[0], operation="replace"), db_lines[1]]
-    assert score_extraction(swapped, correct) == (1, 2)
+    assert score_extraction(swapped, reference) == (1, 2)
 
     inflated = [dict(db_lines[0], labor_hours=7.5), db_lines[1]]
-    assert score_extraction(inflated, correct) == (1, 2)
+    assert score_extraction(inflated, reference) == (1, 2)
 
     dropped = [db_lines[1]]
-    assert score_extraction(dropped, correct) == (1, 2)
+    assert score_extraction(dropped, reference) == (1, 2)
 
     hours_missing = [dict(db_lines[0], labor_hours=None), db_lines[1]]
-    assert score_extraction(hours_missing, correct) == (1, 2)
+    assert score_extraction(hours_missing, reference) == (1, 2)
 
 
 def test_cost_of_usage_cached_free_fresh_fallback(monkeypatch):

@@ -134,30 +134,30 @@ def flag_matches_error(flag: dict[str, Any], error: dict[str, Any],
 
 
 def score_extraction(db_lines: list[dict[str, Any]],
-                     correct_lines: list[dict[str, Any]]) -> tuple[int, int]:
-    """(matched, total): DB lines exactly matching estimate_correct.json.
+                     reference_lines: list[dict[str, Any]]) -> tuple[int, int]:
+    """(matched, total): DB lines exactly matching the reference lines.
 
-    A correct line counts as matched when the pipeline's post-reconcile DB
-    row with the same ``line_no`` agrees on canonical part (case/space
-    insensitive), operation, and labor hours. ``total`` is the correct-line
-    count. Note this literally follows section 10.3, so injected errors
-    that alter a counted field (dropped line, swapped op, inflated hours)
-    lower the score by design; the per-car detail in ``eval_report.json``
-    keeps that visible.
+    A reference line counts as matched when the pipeline's post-reconcile
+    DB row with the same ``line_no`` agrees on canonical part (case/space
+    insensitive), operation, and labor hours. ``total`` is the reference
+    count. Callers pass the SEEDED estimate lines (the extractor's actual
+    input), so the score measures transcribe fidelity: a faithful copy of
+    a seeded error (swapped op, inflated hours) matches, and a dropped
+    line contributes no total since it was never in the input.
     """
     by_no = {line["line_no"]: line for line in db_lines}
     matched = 0
-    for correct in correct_lines:
-        got = by_no.get(correct.get("line_no"))
+    for reference in reference_lines:
+        got = by_no.get(reference.get("line_no"))
         if got is None:
             continue
         if norm_part(got.get("canonical_part")) != norm_part(
-            correct.get("canonical_part")
+            reference.get("canonical_part")
         ):
             continue
-        if (got.get("operation") or "") != (correct.get("operation") or ""):
+        if (got.get("operation") or "") != (reference.get("operation") or ""):
             continue
-        want_hours = correct.get("labor_hours")
+        want_hours = reference.get("labor_hours")
         got_hours = got.get("labor_hours")
         if want_hours is None or got_hours is None:
             if want_hours is not None or got_hours is not None:
@@ -165,29 +165,27 @@ def score_extraction(db_lines: list[dict[str, Any]],
         elif float(got_hours) != float(want_hours):
             continue
         matched += 1
-    return matched, len(correct_lines)
+    return matched, len(reference_lines)
 
 
 def cost_of_usage(events: list[dict[str, Any]]) -> tuple[float, bool]:
-    """(usd, estimated): price fresh calls at the fallback rate (spec 13).
+    """(usd, estimated): price usage events at the config price table.
 
-    Cached calls cost $0. Fresh calls without a usable usage payload fall
-    back to ``SPARK_USD_PER_CALL`` — except ``kind="segment"`` events, which
-    price at ``SAM_USD_PER_IMAGE`` (each SAM request bills one image) — and
-    mark the figure estimated. Replayed eval calls carry no usage payload,
-    so with the default ``$0`` Spark fallback eval cost is ``$0.00`` and
-    ``estimated`` is true whenever any fresh (cache-miss) call ran.
+    Delegates per event to ``meta_client.event_cost_usd`` (spec 13):
+    cached calls cost $0; token usage prices exactly; calls without a
+    usable payload fall back to ``SPARK_USD_PER_CALL`` and mark the
+    figure estimated. Replayed eval calls carry no usage payload, so
+    eval cost is fallback-priced and ``estimated`` is true whenever any
+    fresh (cache-miss) call ran.
     """
+    from claimlens import meta_client
+
     total = 0.0
     estimated = False
     for event in events:
-        if event.get("cached"):
-            continue
-        if event.get("kind") == "segment":
-            total += config.SAM_USD_PER_IMAGE
-        else:
-            total += config.SPARK_USD_PER_CALL
-        estimated = True
+        usd, est = meta_client.event_cost_usd(event)
+        total += usd
+        estimated = estimated or est
     return total, estimated
 
 
@@ -669,19 +667,27 @@ def run_car(car: EvalCar, cache_rows: dict[str, str] | None) -> CarResult:
                     break
         result.matched_flags = len(matched_flag_ids)
 
-        # Extraction accuracy on post-reconcile DB rows.
+        # Extraction accuracy on post-reconcile DB rows, scored against the
+        # SEEDED estimate (the extractor's actual input). Scoring against
+        # estimate_correct.json instead would punish faithful transcription:
+        # a dropped line is absent from the input, so no extractor could
+        # reproduce it. (Spec section 10.3 names the correct file; the
+        # seeded file is the only reference under which the metric can
+        # measure extractor fidelity. Recall/precision stay grounded on
+        # the correct doc via correct_by_line above.)
         db_lines = [
             _row_json(row[0])
             for row in conn.execute(
                 "SELECT line FROM estimate_lines ORDER BY line_no"
             ).fetchall()
         ]
-        correct_lines = (
-            [line.model_dump(mode="json") for line in correct.lines]
-            if correct is not None
+        seeded = car.estimate_seeded
+        seeded_lines = (
+            [line.model_dump(mode="json") for line in seeded.lines]
+            if seeded is not None
             else []
         )
-        matched, total = score_extraction(db_lines, correct_lines)
+        matched, total = score_extraction(db_lines, seeded_lines)
         result.extraction_matched = matched
         result.extraction_total = total
 

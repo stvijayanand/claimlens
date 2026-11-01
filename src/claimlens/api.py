@@ -44,7 +44,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
 from PIL import Image
 
-from . import agent, assess, config, db, estimate, report, vision
+from . import agent, assess, config, db, estimate, meta_client, report, vision
 
 log = logging.getLogger(__name__)
 
@@ -356,11 +356,12 @@ def run_pipeline(
             )
             _set_run(run_id, progress=0.75)
 
-            # Cost accounting (spec section 13): per-call fallback prices
-            # when the API returns no usage payload. Live SAM calls emit one
-            # usage event per request (each billed as one segmented image);
-            # with stub transports (no live SAM) each photo budgets the two
-            # batches (parts + damage) as before.
+            # Cost accounting (spec section 13): token usage prices
+            # exactly via event_cost_usd, falling back per call when the
+            # API returns no usage payload. Live SAM calls emit one
+            # usage event per request (each billed as one segmented
+            # image); with stub transports (no live SAM) each photo
+            # budgets the two batches (parts + damage) as before.
             live_sam_images = sum(
                 1
                 for event in usage_events
@@ -369,15 +370,13 @@ def run_pipeline(
             )
             if live_sam_images == 0:
                 live_sam_images = len(photos) * 2
-            uncached_spark = sum(
-                1
+            spark_cost = sum(
+                meta_client.event_cost_usd(event)[0]
                 for event in usage_events
                 if event.get("kind") != "segment"
-                and not event.get("cached")
             )
             api_cost = (
-                uncached_spark * config.SPARK_USD_PER_CALL
-                + live_sam_images * config.SAM_USD_PER_IMAGE
+                spark_cost + live_sam_images * config.SAM_USD_PER_IMAGE
             )
             conn.execute(
                 "UPDATE runs SET api_cost_usd = ? WHERE run_id = ?",

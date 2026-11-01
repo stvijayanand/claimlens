@@ -168,6 +168,19 @@ def test_list_visible_parts_attaches_taxonomy_and_filters():
     conn.close()
 
 
+def test_listing_taxonomy_block_leads_for_prefix_cache():
+    """The stable taxonomy block leads, so prefix caching reuses it."""
+    conn = _memdb_with_photos(["p1"])
+    stub = _listing_stub(
+        [{"canonical_part": "hood", "side": None, "confidence": 0.9}]
+    )
+    vision.list_visible_parts(conn, "p1", transport=stub)
+    user_text = stub.payloads[0]["messages"][1]["content"]
+    assert user_text.startswith(taxonomy.prompt_block())
+    assert user_text.endswith("List the car parts visible in photo p1.")
+    conn.close()
+
+
 def test_list_visible_parts_all_filtered_writes_no_rows():
     conn = _memdb_with_photos(["p1"])
     stub = _listing_stub(

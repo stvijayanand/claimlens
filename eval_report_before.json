@@ -1,0 +1,497 @@
+{
+  "cold": true,
+  "replay": true,
+  "replay_note": "Model calls replayed from staged fixtures (live SAM has no transport; see module docstring). Vision overlap/crop code, extraction validation, model_cache behavior, the agent loop, and report assembly all run for real.",
+  "splits": {
+    "real": {
+      "split": "real",
+      "cars_total": 5,
+      "cars_completed": 5,
+      "cars_failed": 0,
+      "metrics": {
+        "recall": 1.0,
+        "precision": 1.0,
+        "extraction_accuracy": 0.7272727272727273,
+        "part_detection": null,
+        "schema_pass_rate": 1.0,
+        "time_p50_ms": 634.0036000037799,
+        "time_p95_ms": 1061.3735000079032,
+        "cost_mean_usd": 0.0,
+        "cost_estimated": true,
+        "cache_hits": 0,
+        "cache_misses": 21
+      },
+      "targets": {
+        "recall": ">=80%",
+        "precision": ">=75%",
+        "extraction_accuracy": ">=90%",
+        "part_detection": ">=85%",
+        "schema_pass_rate": "100%",
+        "time": "p50<2min",
+        "cost": "<$0.50"
+      },
+      "cars": [
+        {
+          "car_id": "real001",
+          "split": "real",
+          "ok": true,
+          "error": "",
+          "wall_ms": 503.7609999999404,
+          "cost_usd": 0.0,
+          "cost_estimated": true,
+          "cache_hits": 0,
+          "cache_misses": 4,
+          "schema_passed": 4,
+          "schema_failed": 0,
+          "flags": [
+            {
+              "flag_type": "missing_line",
+              "canonical_part": "rear door",
+              "reason": "rear door shows moderate dent in crop real001-p0:rear door:0-0-637-419 with no matching estimate line.",
+              "confidence": 0.9,
+              "evidence_crop_ids": [
+                "real001-p0:rear door:0-0-637-419"
+              ],
+              "evidence_line_nos": [],
+              "shop_questions": [
+                "The photos show moderate dent on the rear door that is not listed on the estimate \u2014 why is there no line for it?"
+              ]
+            }
+          ],
+          "injected": [
+            {
+              "error_type": "missing_line",
+              "line_no": 2,
+              "detail": "dropped line covering 'rr door shell' (op=replace)"
+            }
+          ],
+          "matched_errors": 1,
+          "matched_flags": 1,
+          "extraction_matched": 1,
+          "extraction_total": 2,
+          "detection_hit": null,
+          "best_iou": null,
+          "unparsed_lines": 0
+        },
+        {
+          "car_id": "real002",
+          "split": "real",
+          "ok": true,
+          "error": "",
+          "wall_ms": 634.0036000037799,
+          "cost_usd": 0.0,
+          "cost_estimated": true,
+          "cache_hits": 0,
+          "cache_misses": 5,
+          "schema_passed": 5,
+          "schema_failed": 0,
+          "flags": [
+            {
+              "flag_type": "duplicate",
+              "canonical_part": "hood",
+              "reason": "Estimate lines 1 and 4 both match the same hood damage (real002-p0:hood:0-0-637-440).",
+              "confidence": 0.68,
+              "evidence_crop_ids": [
+                "real002-p0:hood:0-0-637-440"
+              ],
+              "evidence_line_nos": [
+                1,
+                4
+              ],
+              "shop_questions": [
+                "Lines 1 and 4 both seem to cover the same hood damage \u2014 is one of them a duplicate?"
+              ]
+            }
+          ],
+          "injected": [
+            {
+              "error_type": "duplicate",
+              "line_no": 4,
+              "detail": "duplicated line_no=1 as line_no=4"
+            }
+          ],
+          "matched_errors": 1,
+          "matched_flags": 1,
+          "extraction_matched": 3,
+          "extraction_total": 3,
+          "detection_hit": null,
+          "best_iou": null,
+          "unparsed_lines": 0
+        },
+        {
+          "car_id": "real003",
+          "split": "real",
+          "ok": true,
+          "error": "",
+          "wall_ms": 551.1934999958612,
+          "cost_usd": 0.0,
+          "cost_estimated": true,
+          "cache_hits": 0,
+          "cache_misses": 4,
+          "schema_passed": 4,
+          "schema_failed": 0,
+          "flags": [
+            {
+              "flag_type": "repair_vs_replace",
+              "canonical_part": "fender",
+              "reason": "Line 2 says 'replace' but the fender damage reads 'repair' (likelihood 0.90).",
+              "confidence": 0.9,
+              "evidence_crop_ids": [
+                "real003-p0:fender:0-0-629-471"
+              ],
+              "evidence_line_nos": [
+                2
+              ],
+              "shop_questions": [
+                "Line 2 says 'replace' for the fender, but the photos suggest 'repair' \u2014 can you explain the difference?"
+              ]
+            }
+          ],
+          "injected": [
+            {
+              "error_type": "repair_vs_replace",
+              "line_no": 2,
+              "detail": "swapped op 'repair' -> 'replace'"
+            }
+          ],
+          "matched_errors": 1,
+          "matched_flags": 1,
+          "extraction_matched": 1,
+          "extraction_total": 2,
+          "detection_hit": null,
+          "best_iou": null,
+          "unparsed_lines": 0
+        },
+        {
+          "car_id": "real004",
+          "split": "real",
+          "ok": true,
+          "error": "",
+          "wall_ms": 1061.3735000079032,
+          "cost_usd": 0.0,
+          "cost_estimated": true,
+          "cache_hits": 0,
+          "cache_misses": 4,
+          "schema_passed": 4,
+          "schema_failed": 0,
+          "flags": [
+            {
+              "flag_type": "labor_out_of_range",
+              "canonical_part": "rear door",
+              "reason": "Line 1 bills 7.5h for repair on rear door (typical 2.0\u20136.0h).",
+              "confidence": 0.9,
+              "evidence_crop_ids": [],
+              "evidence_line_nos": [
+                1
+              ],
+              "shop_questions": [
+                "Line 1 bills 7.5 hours for repair on the rear door \u2014 why is it outside the typical range?"
+              ]
+            }
+          ],
+          "injected": [
+            {
+              "error_type": "labor_out_of_range",
+              "line_no": 1,
+              "detail": "inflated hours 3.0 -> 7.5 (x2.5)"
+            }
+          ],
+          "matched_errors": 1,
+          "matched_flags": 1,
+          "extraction_matched": 1,
+          "extraction_total": 2,
+          "detection_hit": null,
+          "best_iou": null,
+          "unparsed_lines": 0
+        },
+        {
+          "car_id": "real005",
+          "split": "real",
+          "ok": true,
+          "error": "",
+          "wall_ms": 642.2047999949427,
+          "cost_usd": 0.0,
+          "cost_estimated": true,
+          "cache_hits": 0,
+          "cache_misses": 4,
+          "schema_passed": 4,
+          "schema_failed": 0,
+          "flags": [
+            {
+              "flag_type": "phantom_line",
+              "canonical_part": "mirror",
+              "reason": "Estimate line 3 ('mirror') has no matching visible damage.",
+              "confidence": 0.8,
+              "evidence_crop_ids": [],
+              "evidence_line_nos": [
+                3
+              ],
+              "shop_questions": [
+                "Can you show me the damage behind line 3 (mirror) in the photos?"
+              ]
+            }
+          ],
+          "injected": [
+            {
+              "error_type": "phantom_line",
+              "line_no": 3,
+              "detail": "added phantom line for undamaged part 'mirror'"
+            }
+          ],
+          "matched_errors": 1,
+          "matched_flags": 1,
+          "extraction_matched": 2,
+          "extraction_total": 2,
+          "detection_hit": null,
+          "best_iou": null,
+          "unparsed_lines": 0
+        }
+      ]
+    },
+    "synthetic": {
+      "split": "synthetic",
+      "cars_total": 5,
+      "cars_completed": 5,
+      "cars_failed": 0,
+      "metrics": {
+        "recall": 1.0,
+        "precision": 1.0,
+        "extraction_accuracy": 0.4,
+        "part_detection": 1.0,
+        "schema_pass_rate": 1.0,
+        "time_p50_ms": 475.8548999961931,
+        "time_p95_ms": 628.5972999903606,
+        "cost_mean_usd": 0.0,
+        "cost_estimated": true,
+        "cache_hits": 0,
+        "cache_misses": 15
+      },
+      "targets": {
+        "recall": ">=80%",
+        "precision": ">=75%",
+        "extraction_accuracy": ">=90%",
+        "part_detection": ">=85%",
+        "schema_pass_rate": "100%",
+        "time": "p50<2min",
+        "cost": "<$0.50"
+      },
+      "cars": [
+        {
+          "car_id": "syn001",
+          "split": "synthetic",
+          "ok": true,
+          "error": "",
+          "wall_ms": 628.5972999903606,
+          "cost_usd": 0.0,
+          "cost_estimated": true,
+          "cache_hits": 0,
+          "cache_misses": 3,
+          "schema_passed": 3,
+          "schema_failed": 0,
+          "flags": [
+            {
+              "flag_type": "missing_line",
+              "canonical_part": "trunk lid",
+              "reason": "trunk lid shows moderate dent in crop syn001-p0:trunk lid:448-563-1242-797 with no matching estimate line.",
+              "confidence": 0.9,
+              "evidence_crop_ids": [
+                "syn001-p0:trunk lid:448-563-1242-797"
+              ],
+              "evidence_line_nos": [],
+              "shop_questions": [
+                "The photos show moderate dent on the trunk lid that is not listed on the estimate \u2014 why is there no line for it?"
+              ]
+            }
+          ],
+          "injected": [
+            {
+              "error_type": "missing_line",
+              "line_no": 1,
+              "detail": "dropped line covering 'trunk lid' (op=repair)"
+            }
+          ],
+          "matched_errors": 1,
+          "matched_flags": 1,
+          "extraction_matched": 0,
+          "extraction_total": 1,
+          "detection_hit": true,
+          "best_iou": 0.5909707421042434,
+          "unparsed_lines": 0
+        },
+        {
+          "car_id": "syn002",
+          "split": "synthetic",
+          "ok": true,
+          "error": "",
+          "wall_ms": 475.8548999961931,
+          "cost_usd": 0.0,
+          "cost_estimated": true,
+          "cache_hits": 0,
+          "cache_misses": 3,
+          "schema_passed": 3,
+          "schema_failed": 0,
+          "flags": [
+            {
+              "flag_type": "duplicate",
+              "canonical_part": "fender",
+              "reason": "Estimate lines 1 and 2 both match the same fender damage (syn002-p0:fender:558-661-1182-999).",
+              "confidence": 0.68,
+              "evidence_crop_ids": [
+                "syn002-p0:fender:558-661-1182-999"
+              ],
+              "evidence_line_nos": [
+                1,
+                2
+              ],
+              "shop_questions": [
+                "Lines 1 and 2 both seem to cover the same fender damage \u2014 is one of them a duplicate?"
+              ]
+            }
+          ],
+          "injected": [
+            {
+              "error_type": "duplicate",
+              "line_no": 2,
+              "detail": "duplicated line_no=1 as line_no=2"
+            }
+          ],
+          "matched_errors": 1,
+          "matched_flags": 1,
+          "extraction_matched": 1,
+          "extraction_total": 1,
+          "detection_hit": true,
+          "best_iou": 0.591715976331361,
+          "unparsed_lines": 0
+        },
+        {
+          "car_id": "syn003",
+          "split": "synthetic",
+          "ok": true,
+          "error": "",
+          "wall_ms": 481.02099999960046,
+          "cost_usd": 0.0,
+          "cost_estimated": true,
+          "cache_hits": 0,
+          "cache_misses": 3,
+          "schema_passed": 3,
+          "schema_failed": 0,
+          "flags": [
+            {
+              "flag_type": "repair_vs_replace",
+              "canonical_part": "rear door",
+              "reason": "Line 1 says 'replace' but the rear door damage reads 'repair' (likelihood 0.90).",
+              "confidence": 0.9,
+              "evidence_crop_ids": [
+                "syn003-p0:rear door:851-523-1449-1017"
+              ],
+              "evidence_line_nos": [
+                1
+              ],
+              "shop_questions": [
+                "Line 1 says 'replace' for the rear door, but the photos suggest 'repair' \u2014 can you explain the difference?"
+              ]
+            }
+          ],
+          "injected": [
+            {
+              "error_type": "repair_vs_replace",
+              "line_no": 1,
+              "detail": "swapped op 'repair' -> 'replace'"
+            }
+          ],
+          "matched_errors": 1,
+          "matched_flags": 1,
+          "extraction_matched": 0,
+          "extraction_total": 1,
+          "detection_hit": true,
+          "best_iou": 0.591715976331361,
+          "unparsed_lines": 0
+        },
+        {
+          "car_id": "syn004",
+          "split": "synthetic",
+          "ok": true,
+          "error": "",
+          "wall_ms": 446.0892000060994,
+          "cost_usd": 0.0,
+          "cost_estimated": true,
+          "cache_hits": 0,
+          "cache_misses": 3,
+          "schema_passed": 3,
+          "schema_failed": 0,
+          "flags": [
+            {
+              "flag_type": "labor_out_of_range",
+              "canonical_part": "hood",
+              "reason": "Line 1 bills 8.75h for repair on hood (typical 2.0\u20135.0h).",
+              "confidence": 0.9,
+              "evidence_crop_ids": [],
+              "evidence_line_nos": [
+                1
+              ],
+              "shop_questions": [
+                "Line 1 bills 8.75 hours for repair on the hood \u2014 why is it outside the typical range?"
+              ]
+            }
+          ],
+          "injected": [
+            {
+              "error_type": "labor_out_of_range",
+              "line_no": 1,
+              "detail": "inflated hours 3.5 -> 8.75 (x2.5)"
+            }
+          ],
+          "matched_errors": 1,
+          "matched_flags": 1,
+          "extraction_matched": 0,
+          "extraction_total": 1,
+          "detection_hit": true,
+          "best_iou": 0.5923961096374889,
+          "unparsed_lines": 0
+        },
+        {
+          "car_id": "syn005",
+          "split": "synthetic",
+          "ok": true,
+          "error": "",
+          "wall_ms": 438.08020000869874,
+          "cost_usd": 0.0,
+          "cost_estimated": true,
+          "cache_hits": 0,
+          "cache_misses": 3,
+          "schema_passed": 3,
+          "schema_failed": 0,
+          "flags": [
+            {
+              "flag_type": "phantom_line",
+              "canonical_part": "headlight",
+              "reason": "Estimate line 2 ('headlight') has no matching visible damage.",
+              "confidence": 0.8,
+              "evidence_crop_ids": [],
+              "evidence_line_nos": [
+                2
+              ],
+              "shop_questions": [
+                "Can you show me the damage behind line 2 (headlight) in the photos?"
+              ]
+            }
+          ],
+          "injected": [
+            {
+              "error_type": "phantom_line",
+              "line_no": 2,
+              "detail": "added phantom line for undamaged part 'headlight'"
+            }
+          ],
+          "matched_errors": 1,
+          "matched_flags": 1,
+          "extraction_matched": 1,
+          "extraction_total": 1,
+          "detection_hit": true,
+          "best_iou": 0.5941213258286429,
+          "unparsed_lines": 0
+        }
+      ]
+    }
+  }
+}
