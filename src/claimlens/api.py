@@ -155,6 +155,24 @@ def _get_run(run_id: str) -> dict[str, Any] | None:
         return dict(state) if state is not None else None
 
 
+def _memory_status_payload(
+    run_id: str, car_id: str, state: dict[str, Any]
+) -> dict[str, Any]:
+    """Build a status payload from in-memory run state (no database)."""
+    status = state.get("status", "queued")
+    payload: dict[str, Any] = {
+        "run_id": run_id,
+        "car_id": car_id,
+        "status": status,
+        "progress": float(state.get("progress", 0.0)),
+        "feature_flags": _feature_flags(),
+    }
+    if status == "error":
+        payload["error"] = state.get("error", "run failed")
+        payload["cause"] = state.get("cause", "unknown")
+    return payload
+
+
 def _photo_count(conn: Any, car_id: str) -> int:
     row = conn.execute(
         "SELECT COUNT(*) FROM photos WHERE car_id = ?", [car_id]
@@ -636,34 +654,41 @@ def start_run(car_id: str) -> dict[str, str]:
 
 @app.get("/cars/{car_id}/runs/{run_id}")
 def get_run(car_id: str, run_id: str) -> dict[str, Any]:
-    """Poll run status; the full report rides along once done."""
+    """Poll run status; the full report rides along once done.
+
+    Live state is served from memory without touching the database lock,
+    so progress polls answer while the pipeline holds the lock. The
+    database is read only to build a done report and for the restart
+    fallback, when no run holds the lock.
+    """
+    state = _get_run(run_id)
+    if state is not None:
+        if state.get("car_id") != car_id:
+            raise HTTPException(
+                status_code=404,
+                detail=f"run {run_id} does not belong to car {car_id}",
+            )
+        if state.get("status", "queued") != "done":
+            return _memory_status_payload(run_id, car_id, state)
+        # Done: fall through to build the report from the database. The
+        # worker releases the lock before marking done, so this never
+        # waits on a live run.
     with _DB_LOCK:
         conn = _connect()
         try:
             _require_car(conn, car_id)
             state = _get_run(run_id)
-            if state is not None and state.get("car_id") == car_id:
-                status = state.get("status", "queued")
-                payload: dict[str, Any] = {
-                    "run_id": run_id,
-                    "car_id": car_id,
-                    "status": status,
-                    "progress": float(state.get("progress", 0.0)),
-                    "feature_flags": _feature_flags(),
-                }
-                if status == "done":
-                    payload["report"] = report.build_report(
-                        conn, car_id, run_id
-                    )
-                elif status == "error":
-                    payload["error"] = state.get("error", "run failed")
-                    payload["cause"] = state.get("cause", "unknown")
-                return payload
             if state is not None:
-                raise HTTPException(
-                    status_code=404,
-                    detail=f"run {run_id} does not belong to car {car_id}",
-                )
+                if state.get("car_id") != car_id:
+                    raise HTTPException(
+                        status_code=404,
+                        detail=f"run {run_id} does not belong to car {car_id}",
+                    )
+                if state.get("status", "queued") != "done":
+                    return _memory_status_payload(run_id, car_id, state)
+                payload = _memory_status_payload(run_id, car_id, state)
+                payload["report"] = report.build_report(conn, car_id, run_id)
+                return payload
             fallback = _status_from_db(conn, car_id, run_id)
             if fallback is None:
                 raise HTTPException(

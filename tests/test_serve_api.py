@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import io
 import json
+import threading
 import time
 
 import pytest
@@ -407,6 +408,41 @@ def test_incomplete_run_row_reads_as_error_never_partial(client, db_file):
     assert payload["status"] == "error"
     assert payload["cause"]
     assert client.get(f"/cars/{car_id}/report").status_code == 404
+
+
+def test_run_status_polls_while_pipeline_holds_lock(
+    client, db_file, monkeypatch
+):
+    """Progress polls answer from memory while the run holds the DB lock."""
+    entered = threading.Event()
+    release = threading.Event()
+
+    def slow_pipeline(car_id, run_id):
+        with api._DB_LOCK:
+            entered.set()
+            assert release.wait(timeout=30)
+
+    monkeypatch.setattr(api, "PIPELINE", slow_pipeline)
+    car_id = _make_car(client)
+    run_id = client.post(f"/cars/{car_id}/run").json()["run_id"]
+    assert entered.wait(timeout=30)
+    got: dict = {}
+    errors: list = []
+
+    def poll():
+        try:
+            got.update(api.get_run(car_id, run_id))
+        except Exception as exc:  # noqa: BLE001 - surfaced below
+            errors.append(exc)
+
+    worker = threading.Thread(target=poll, daemon=True)
+    worker.start()
+    worker.join(timeout=10)
+    release.set()
+    assert not worker.is_alive(), "status poll blocked behind the lock"
+    assert not errors
+    assert got["status"] in ("queued", "running")
+    assert 0.0 <= got["progress"] <= 1.0
 
 
 # --- GET /cars/{id}/report --------------------------------------------------
