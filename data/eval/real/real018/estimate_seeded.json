@@ -1,0 +1,33 @@
+{
+  "synthetic": false,
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_part_text": "fender",
+      "canonical_part": "fender",
+      "side": "FL",
+      "operation": "repair",
+      "labor_hours": 3.0,
+      "price": 450.0
+    },
+    {
+      "line_no": 2,
+      "raw_part_text": "frt bpr cvr",
+      "canonical_part": "front bumper cover",
+      "side": null,
+      "operation": "refinish",
+      "labor_hours": 2.5,
+      "price": 400.0
+    },
+    {
+      "line_no": 3,
+      "raw_part_text": "mirror",
+      "canonical_part": "mirror",
+      "side": "FL",
+      "operation": "replace",
+      "labor_hours": 0.5,
+      "price": null
+    }
+  ],
+  "unparsed_count": 0
+}

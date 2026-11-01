@@ -3,14 +3,15 @@
 Layout per `docs/implementation-spec.md` §10.1:
 
 - `real/<car_id>/{photo_1.*, estimate_correct.json, estimate_seeded.json,
-  injected_errors.json, source.json}` — 5 cars.
+  injected_errors.json, source.json}` — 20 cars.
 - `synthetic/<car_id>/{photo.jpg, ground_truth.json, estimate_correct.json,
   estimate_seeded.json, injected_errors.json, source.json}` — 5 cars.
 
 Every staged car has `estimate_correct.json` + `estimate_seeded.json` +
-`injected_errors.json`, each with ≥1 injected error. All five error types
+`injected_errors.json`, each with exactly 1 injected error. All five error types
 (`phantom_line`, `missing_line`, `repair_vs_replace`, `duplicate`,
-`labor_out_of_range`) are covered in each split:
+`labor_out_of_range`) are covered in each split (real: 4 cars per type;
+synthetic: 1 car per type):
 
 | car | damage | seed |
 |---|---|---|
@@ -19,6 +20,21 @@ Every staged car has `estimate_correct.json` + `estimate_seeded.json` +
 | real003 | front door torn + fender (FL) | swap_repair_replace → repair_vs_replace |
 | real004 | rear door + quarter panel (RR) | inflate_hours → labor_out_of_range |
 | real005 | front bumper + grille | add_phantom → phantom_line |
+| real006 | front bumper torn + headlight (FR) | drop_line → missing_line |
+| real007 | quarter panel + rear bumper (RL) | drop_line → missing_line |
+| real008 | quarter panel + rear bumper (RR) | drop_line → missing_line |
+| real009 | hood + front bumper | duplicate_line → duplicate |
+| real010 | rear door + quarter panel (RR) | duplicate_line → duplicate |
+| real011 | tailgate + rear bumper | duplicate_line → duplicate |
+| real012 | rear bumper | swap_repair_replace → repair_vs_replace |
+| real013 | quarter panel (RR) | swap_repair_replace → repair_vs_replace |
+| real014 | rear bumper | swap_repair_replace → repair_vs_replace |
+| real015 | quarter panel + rear bumper (RL) | inflate_hours → labor_out_of_range |
+| real016 | headlight + fender (FL) | inflate_hours → labor_out_of_range |
+| real017 | headlight + fender (FL) | inflate_hours → labor_out_of_range |
+| real018 | fender + front bumper (FL) | add_phantom → phantom_line |
+| real019 | rear bumper | add_phantom → phantom_line |
+| real020 | front bumper (close-up) | add_phantom → phantom_line |
 | syn001 | trunk lid dent | drop_line → missing_line |
 | syn002 | fender scratch (FL) | duplicate_line → duplicate |
 | syn003 | rear door dent (RL) | swap_repair_replace → repair_vs_replace |

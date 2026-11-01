@@ -1,0 +1,15 @@
+{
+  "synthetic": false,
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_part_text": "frt bpr cvr",
+      "canonical_part": "front bumper cover",
+      "side": null,
+      "operation": "replace",
+      "labor_hours": 1.5,
+      "price": 540.0
+    }
+  ],
+  "unparsed_count": 0
+}

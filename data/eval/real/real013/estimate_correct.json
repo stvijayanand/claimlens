@@ -1,0 +1,15 @@
+{
+  "synthetic": false,
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_part_text": "qtr panel",
+      "canonical_part": "quarter panel",
+      "side": "RR",
+      "operation": "repair",
+      "labor_hours": 4.0,
+      "price": 610.0
+    }
+  ],
+  "unparsed_count": 0
+}

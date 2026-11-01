@@ -1,0 +1,10 @@
+{
+  "synthetic": false,
+  "errors": [
+    {
+      "error_type": "missing_line",
+      "line_no": 1,
+      "detail": "dropped line covering 'qtr panel' (op=repair)"
+    }
+  ]
+}

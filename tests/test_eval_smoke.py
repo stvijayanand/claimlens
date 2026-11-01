@@ -135,16 +135,20 @@ def test_extraction_scored_against_seeded_input():
     assert (dropped.extraction_matched, dropped.extraction_total) == (0, 0)
 
 
-@pytest.mark.parametrize("split", ["real", "synthetic"])
-def test_full_split_completes_with_separate_scoring(tmp_path, split):
+@pytest.mark.parametrize(
+    ("split", "cars_total"), [("real", 20), ("synthetic", 5)]
+)
+def test_full_split_completes_with_separate_scoring(
+    tmp_path, split, cars_total
+):
     """Both staged splits run to completion and score separately."""
     report_data = run_eval(
         [split], cache_db=str(tmp_path / "cache.duckdb"), cold=True
     )
     assert list(report_data["splits"]) == [split]
     scored = report_data["splits"][split]
-    assert scored["cars_total"] == 5
-    assert scored["cars_completed"] == 5
+    assert scored["cars_total"] == cars_total
+    assert scored["cars_completed"] == cars_total
     assert scored["metrics"]["recall"] == 1.0
     assert scored["metrics"]["precision"] == 1.0
     if split == "real":

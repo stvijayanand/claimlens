@@ -1,0 +1,33 @@
+{
+  "synthetic": false,
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_part_text": "tailgate",
+      "canonical_part": "tailgate",
+      "side": null,
+      "operation": "replace",
+      "labor_hours": null,
+      "price": 480.0
+    },
+    {
+      "line_no": 2,
+      "raw_part_text": "rr bumper",
+      "canonical_part": "rear bumper cover",
+      "side": null,
+      "operation": "replace",
+      "labor_hours": 1.5,
+      "price": 555.0
+    },
+    {
+      "line_no": 3,
+      "raw_part_text": "tailgate",
+      "canonical_part": "tailgate",
+      "side": null,
+      "operation": "replace",
+      "labor_hours": null,
+      "price": 480.0
+    }
+  ],
+  "unparsed_count": 0
+}

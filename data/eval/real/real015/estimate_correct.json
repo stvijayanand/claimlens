@@ -1,0 +1,24 @@
+{
+  "synthetic": false,
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_part_text": "qtr panel",
+      "canonical_part": "quarter panel",
+      "side": "RL",
+      "operation": "repair",
+      "labor_hours": 4.0,
+      "price": 630.0
+    },
+    {
+      "line_no": 2,
+      "raw_part_text": "rr bpr cvr",
+      "canonical_part": "rear bumper cover",
+      "side": null,
+      "operation": "replace",
+      "labor_hours": 1.5,
+      "price": 560.0
+    }
+  ],
+  "unparsed_count": 0
+}
