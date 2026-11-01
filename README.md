@@ -2,6 +2,39 @@
 
 After an accident, car owners get repair estimates they can't read: dozens of part codes and labor hours. ClaimLens brings check to the owner, built on Meta's models. SAM 3.1 segments car parts and damage in 4–10 photos. Muse Spark judges each damaged part and reads the estimate PDF, both as structured output against my schemas, then runs as a tool-calling agent that matches lines to damage and records flags with evidence and confidence. Muse Image creates labeled test photos with damage at known spots. I'll evaluate on real and synthetic photo sets with estimates seeded with known errors. Targets: 80%+ of errors caught, 75%+ precision, under 2 minutes and $0.50 per car.
 
+## Hackathon originality
+
+Everything demoed here was built during the hackathon (Oct 27–31, 2026). The repo
+started as a one-line README (commit `0743db6`); the design, spec, all source code,
+eval fixtures, tests, and UI were written in that window — see `git log`.
+
+Original work (built during the hackathon, and what the demo highlights):
+
+- `src/claimlens/`: vision pipeline (part listing → SAM segmentation → overlap →
+  crops), damage assessment, estimate extraction, reconcile agent + tools
+  (`normalize_part_name`, `match_damage`, `check_labor_range`, `record_flag`),
+  report assembly, FastAPI app, Streamlit UI, config, DuckDB storage, and the
+  taxonomy/labor-range seed tables.
+- `eval/`: eval runner + metrics, deterministic error-seeding transforms, and the
+  synthetic-generation script.
+- Eval fixtures authored during the hackathon: every `estimate_correct.json`
+  (written by visual inspection of its photo), the seeded estimates,
+  `injected_errors.json` records, synthetic ground-truth boxes, and the rendered
+  demo estimate image.
+- `tests/`: the full test suite. `docs/`: design doc, implementation spec, issue
+  plans. This README's results, rehearsal log, and sample report.
+
+Not original work — third-party inputs, used but not claimed:
+
+- Meta's models (SAM 3.1, Muse Spark, Muse Image), accessed via the Meta Model
+  API. The demo shows our code calling them, not the models themselves.
+- Real eval/demo photos: `DrBimmer/car-parts-and-damage-dataset` (Hugging Face,
+  MIT license), used unmodified; per-car provenance is recorded in `source.json`.
+- Synthetic base photos: Wikimedia Commons (CC BY-SA); damage was added via the
+  Muse Image API during the hackathon.
+- Open-source libraries (FastAPI, Streamlit, DuckDB, Pydantic, and the rest — see
+  `pyproject.toml`).
+
 ## Results (final eval, 2026-11-01)
 
 Cold replay eval (`python eval/run_eval.py --split all --cold`): 20 real + 5 synthetic
@@ -55,9 +88,9 @@ Known limitations (honest, not cuts):
 ## Demo rehearsal (2026-11-01)
 
 Live path (`uvicorn claimlens.api:app` + Meta Model API): 4 front-damage photos
-composited as one demo car (eval photos real006/009/016/017) + a 5-line rendered
-estimate (line 5, mirror, phantom by design). Three end-to-end upload→report runs,
-all `done` without errors:
+composited as one demo car (third-party eval photos real006/009/016/017 — see
+Hackathon originality) + a 5-line rendered estimate (line 5, mirror, phantom by
+design). Three end-to-end upload→report runs, all `done` without errors:
 
 | run | estimate input | lines extracted | flags | wall time | cost |
 |---|---|---|---|---|---|
