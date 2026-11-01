@@ -27,7 +27,7 @@ Original work (built during the hackathon, and what the demo highlights):
 Not original work — third-party inputs, used but not claimed:
 
 - Meta's models (SAM 3.1, Muse Spark, Muse Image), accessed via the Meta Model
-  API. The demo shows our code calling them, not the models themselves.
+  API. The demo shows my code calling them, not the models themselves.
 - Real eval/demo photos: `DrBimmer/car-parts-and-damage-dataset` (Hugging Face,
   MIT license), used unmodified; per-car provenance is recorded in `source.json`.
 - Synthetic base photos: Wikimedia Commons (CC BY-SA); damage was added via the
