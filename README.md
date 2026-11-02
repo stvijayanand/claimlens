@@ -107,16 +107,18 @@ report renders byte-identical in ~0.1s with zero model calls.
 Prerequisites: Python 3.11+, a Meta Model API key.
 
 ```bash
-python -m venv .venv && .venv/bin/activate     # Windows: .venv\Scripts\activate
+python -m venv .venv && .venv/bin/activate     # Windows PowerShell: .\.venv\Scripts\Activate.ps1
 pip install -e .
 
 # Create .env with your key (see src/claimlens/config.py for all overrides):
 # META_MODEL_API_KEY=...
 # META_MODEL_BASE_URL=https://api.meta.ai/v1
 
-# API + UI
+# Terminal 1: API
 python -m uvicorn claimlens.api:app --port 8000
-CLAIMLENS_API_BASE=http://127.0.0.1:8000 streamlit run -m claimlens.ui.app
+
+# Terminal 2: UI (Windows PowerShell: $env:CLAIMLENS_API_BASE="http://127.0.0.1:8000")
+CLAIMLENS_API_BASE=http://127.0.0.1:8000 python -m streamlit run src/claimlens/ui/app.py
 
 # Full eval (cold, both splits) and test suite
 python eval/run_eval.py --split all --cold --out eval_report.json
