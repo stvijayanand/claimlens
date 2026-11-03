@@ -2,6 +2,13 @@
 
 After an accident, car owners get repair estimates they can't read: dozens of part codes and labor hours. ClaimLens brings check to the owner, built on Meta's models. SAM 3.1 segments car parts and damage in 4–10 photos. Muse Spark judges each damaged part and reads the estimate PDF, both as structured output against my schemas, then runs as a tool-calling agent that matches lines to damage and records flags with evidence and confidence. Muse Image creates labeled test photos with damage at known spots. I'll evaluate on real and synthetic photo sets with estimates seeded with known errors. Targets: 80%+ of errors caught, 75%+ precision, under 2 minutes and $0.50 per car.
 
+## Demo video
+
+[![ClaimLens 3-minute demo](https://img.youtube.com/vi/ZA-hRAe1bfM/hqdefault.jpg)](https://www.youtube.com/watch?v=ZA-hRAe1bfM)
+
+3-minute hackathon demo: live upload → report, code tour, eval results.
+Watch: https://www.youtube.com/watch?v=ZA-hRAe1bfM
+
 ## Hackathon originality
 
 Everything demoed here was built during the hackathon (Oct 27–31, 2026). The repo
